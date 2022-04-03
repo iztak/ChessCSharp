@@ -1,0 +1,34 @@
+﻿<Window x:Class="ChessCSharp.Dialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ChessCSharp"
+        mc:Ignorable="d"
+        Title="Dialog" Height="200" Width="450">
+
+    <Grid x:Name="DialogGrid" Margin="10,5,10,5">
+
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="100"/>
+
+
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="35"/>
+            <RowDefinition Height="120"/>
+
+        </Grid.RowDefinitions>
+        <Button  x:Name="btnRook" Content="♖" HorizontalAlignment="Center" Height="110" VerticalAlignment="Top" Width="80" Grid.Column="0"  Grid.Row="1" FontSize="80" Click="OnRookClick" />
+        <Button  x:Name="btnKnight" Content="♘" HorizontalAlignment="Center" Height="110" VerticalAlignment="Top" Width="80" Grid.Column="1" Grid.Row="1"  FontSize="80" Click="OnKnightClick"/>
+        <Button  x:Name="btnBishop" Content="♗" HorizontalAlignment="Center" Height="110" VerticalAlignment="Top" Width="80" Grid.Column="2" Grid.Row="1" FontSize="80" Click="OnBishopClick"/>
+        <Button  x:Name="btnQueen" Content="♕" HorizontalAlignment="Center" Height="110" VerticalAlignment="Top" Width="80" Grid.Column="3" Grid.Row="1" FontSize="80" Click="OnQueenClick"/>
+        <TextBlock Text="Choose a piece." Grid.ColumnSpan="4" HorizontalAlignment="Left" Height="30"  TextWrapping="Wrap" VerticalAlignment="Top"  Grid.Row="0" FontSize="20" />
+
+    </Grid>
+
+</Window>

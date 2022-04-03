@@ -1,0 +1,46 @@
+﻿<Window x:Class="ChessCSharp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ChessCSharp"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="670" Width="600" MouseLeftButtonDown="WindowIsClicked">
+    <Border Padding="5">
+
+        <Grid x:Name="Grid" Margin="0,50,0,0">
+
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="70"/>
+                <ColumnDefinition Width="70"/>
+                <ColumnDefinition Width="70"/>
+                <ColumnDefinition Width="70"/>
+                <ColumnDefinition Width="70"/>
+                <ColumnDefinition Width="70"/>
+                <ColumnDefinition Width="70"/>
+                <ColumnDefinition Width="70"/>
+
+
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="70"/>
+                <RowDefinition Height="70"/>
+                <RowDefinition Height="70"/>
+                <RowDefinition Height="70"/>
+                <RowDefinition Height="70"/>
+                <RowDefinition Height="70"/>
+                <RowDefinition Height="70"/>
+                <RowDefinition Height="70"/>
+
+            </Grid.RowDefinitions>
+
+
+            <TextBlock x:Name="Score" HorizontalAlignment="Left" Height="48" Margin="5,-40,0,0" Text="Start Game" TextWrapping="Wrap" VerticalAlignment="Top" Width="205" FontSize="20" Grid.Column="5" Grid.ColumnSpan="3"/>
+            <Button x:Name="GameControl" Content="Start" Grid.ColumnSpan="3" HorizontalAlignment="Left" Height="31" Margin="0,-42,0,0" VerticalAlignment="Top" Width="175" Click="GameControlIsClicked" FontSize="22"/>
+  
+
+
+        </Grid>
+    </Border>
+</Window>
