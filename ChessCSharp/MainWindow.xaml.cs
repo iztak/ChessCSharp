@@ -21,15 +21,15 @@ namespace ChessCSharp
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     /// 
-        public partial class MainWindow : Window
+    public partial class MainWindow : Window
     {
-        List<Piece> piece = new List<Piece>();
+        public List<Piece> piece = new List<Piece>();
+        public List<Piece> whitePiece = new List<Piece>();
+        public List<Piece> blackPiece = new List<Piece>();
         bool initializePiece;
         Piece pieceToMove;
-        Point currentPoint;
-        Point nextPoint;
         pieceColor pieceToMoveColor;
-
+        public List<Tile> tiles = new List<Tile>();
 
 
         public MainWindow()
@@ -51,25 +51,10 @@ namespace ChessCSharp
             piece.Clear();
             pieceToMove = null;
             initializePiece = false;
+            pieceToMoveColor = pieceColor.empty;
 
-
-            for (int i = 0; i < 8; i++)
-            {
-                for (int j = 0; j < 8; j++)
-                {
-                    if ((i + j) % 2 == 1)
-                    {
-                        Tile t1 = Tile.newTile(Brushes.SaddleBrown,i, j);
-                        Grid.Children.Add(t1);
-                    }
-                    else
-                    {
-                        Tile t2 = Tile.newTile(Brushes.Beige, i, j);
-                        Grid.Children.Add(t2);
-                    }
-                }
-            }
-
+            Board myBoard = new Board(tiles);
+            PrintBoard(myBoard);
 
 
             for (int i = 0; i < 8; i++)
@@ -80,52 +65,56 @@ namespace ChessCSharp
                     {
                         if (i == 0 || i == 7)
                         {
-                            Piece.Rook whiteRook = Piece.Rook.createNewRook("♖", pieceColor.white, i, j);
+                            Piece.Rook whiteRook = Piece.Rook.CreateNewRook("♖", pieceColor.white, i, j);
                             Grid.Children.Add(whiteRook);
+                            whitePiece.Add(whiteRook);
                             piece.Add(whiteRook);
                         }
 
                         if (i == 1 || i == 6)
                         {
-                            Piece.Knight whiteKnight = Piece.Knight.createNewKnight("♘",pieceColor.white, i, j);
+                            Piece.Knight whiteKnight = Piece.Knight.CreateNewKnight("♘",pieceColor.white, i, j);
                             Grid.Children.Add(whiteKnight);
+                            whitePiece.Add(whiteKnight);
                             piece.Add(whiteKnight);
                         }
 
                         if (i == 2 || i == 5)
                         {
-                            Piece.Bishop whiteBishop = Piece.Bishop.createNewBishop("♗", pieceColor.white, i, j);
+                            Piece.Bishop whiteBishop = Piece.Bishop.CreateNewBishop("♗", pieceColor.white, i, j);
                             Grid.Children.Add(whiteBishop);
+                            whitePiece.Add(whiteBishop);
                             piece.Add(whiteBishop);
-
                         }
                         if (i == 3)
                         {
-                            Piece.Queen whiteQueen = Piece.Queen.createNewQueen("♕",pieceColor.white, i, j);
+                            Piece.Queen whiteQueen = Piece.Queen.CreateNewQueen("♕",pieceColor.white, i, j);
                             Grid.Children.Add(whiteQueen);
+                            whitePiece.Add(whiteQueen);
                             piece.Add(whiteQueen);
-
                         }
                         if (i == 4)
                         {
-                            Piece.King whiteKing = Piece.King.createNewKing("♔", pieceColor.white, i, j);
-                            Piece.King.whiteKingPos = whiteKing.gridPosition;
-                            Grid.Children.Add(whiteKing);
-                            piece.Add(whiteKing);
+                            Piece.King.whiteKing = Piece.King.CreateNewKing("♔", pieceColor.white, i, j);
+                            Grid.Children.Add(Piece.King.whiteKing);
+                            whitePiece.Add(Piece.King.whiteKing);
+                            piece.Add(Piece.King.whiteKing);
                         }
                     }
 
                     if (j == 1)
                     {
-                        Piece.Pawn whitePawn = Piece.Pawn.createNewPawn("♙", pieceColor.white, i, j);
+                        Piece.Pawn whitePawn = Piece.Pawn.CreateNewPawn("♙", pieceColor.white, i, j);
                         Grid.Children.Add(whitePawn);
+                        whitePiece.Add(whitePawn);
                         piece.Add(whitePawn);
                     }
 
                     else if (j == 6)
                     {
-                        Piece.Pawn blackPawn = Piece.Pawn.createNewPawn("♟", pieceColor.black, i, j); 
+                        Piece.Pawn blackPawn = Piece.Pawn.CreateNewPawn("♟", pieceColor.black, i, j); 
                         Grid.Children.Add(blackPawn);
+                        blackPiece.Add(blackPawn);
                         piece.Add(blackPawn);
                     }
 
@@ -133,39 +122,41 @@ namespace ChessCSharp
                     {
                         if (i == 0 || i == 7)
                         {
-                            Piece.Rook blackRook = Piece.Rook.createNewRook("♜",pieceColor.black, i, j);
+                            Piece.Rook blackRook = Piece.Rook.CreateNewRook("♜",pieceColor.black, i, j);
                             Grid.Children.Add(blackRook);
+                            blackPiece.Add(blackRook);
                             piece.Add(blackRook);
-
                         }
 
                         if (i == 1 || i == 6)
                         {
-                            Piece.Knight blackKnight = Piece.Knight.createNewKnight("♞", pieceColor.black, i, j);
+                            Piece.Knight blackKnight = Piece.Knight.CreateNewKnight("♞", pieceColor.black, i, j);
                             Grid.Children.Add(blackKnight);
+                            blackPiece.Add(blackKnight);
                             piece.Add(blackKnight);
                         }
 
 
                         if (i == 2 || i == 5)
                         {
-                            Piece.Bishop blackBishop = Piece.Bishop.createNewBishop("♝",pieceColor.black, i, j);
+                            Piece.Bishop blackBishop = Piece.Bishop.CreateNewBishop("♝",pieceColor.black, i, j);
                             Grid.Children.Add(blackBishop);
+                            blackPiece.Add(blackBishop);
                             piece.Add(blackBishop);
                         }
                         if (i == 3)
                         {
-                            Piece.Queen blackQueen = Piece.Queen.createNewQueen("♛",pieceColor.black, i, j);
+                            Piece.Queen blackQueen = Piece.Queen.CreateNewQueen("♛",pieceColor.black, i, j);
                             Grid.Children.Add(blackQueen);
+                            blackPiece.Add(blackQueen);
                             piece.Add(blackQueen);
                         }
                         if (i == 4)
                         {
-                            Piece.King blackKing = Piece.King.createNewKing("♚",pieceColor.black, i, j);
-                            Piece.King.blackKingPos = blackKing.gridPosition;
-                            Grid.Children.Add(blackKing);
-                            piece.Add(blackKing);
-
+                            Piece.King.blackKing = Piece.King.CreateNewKing("♚",pieceColor.black, i, j);
+                            Grid.Children.Add(Piece.King.blackKing);
+                            blackPiece.Add(Piece.King.blackKing);
+                            piece.Add(Piece.King.blackKing);
                         }
                     }
                 }
@@ -175,77 +166,53 @@ namespace ChessCSharp
 
         private void WindowIsClicked(object sender, MouseButtonEventArgs e)
         {
-            if (piece.Count() != 0)
+            if (e.OriginalSource is Piece && initializePiece == false)
             {
-
-                if (e.OriginalSource is Piece && initializePiece == false)
+                Score.Text = "";
+                Piece p1 = (Piece)e.OriginalSource;
+                if(p1.color != pieceToMoveColor)
                 {
-                    Score.Text = "";
-                    Piece p1 = (Piece)e.OriginalSource;
-                    if(p1.color != pieceToMoveColor)
-                    {
-                        currentPoint = p1.gridPosition;
-                        pieceToMove = p1;
-                        initializePiece = true;
-                        pieceToMove.Foreground = Brushes.Red;
-                    }
-                    else { Score.Text = $"Not {pieceToMoveColor} turn."; }
-
+                    pieceToMove = p1;
+                    initializePiece = true;
+                    pieceToMove.Foreground = Brushes.Red;
                 }
+                else { Score.Text = $"Not {pieceToMoveColor} turn."; }
 
-                else if (initializePiece == true && e.OriginalSource is Tile)
-                {
-                    Tile t1 = (Tile)e.OriginalSource;
-                    nextPoint = t1.gridPosition;
-                    MovePiece(currentPoint, nextPoint, pieceToMove, t1);
-                }
-
-
-                else
-                {
-                    pieceToMove = null;
-                }
             }
+
+            else if (initializePiece == true && e.OriginalSource is Tile)
+            {
+                Tile t1 = (Tile)e.OriginalSource;
+                MovePiece(t1.currentPos, pieceToMove, t1);
+            }
+
+
+            else
+            {
+                pieceToMove = null;
+            }
+        
 
         }
 
-        private void MovePiece( Point currentPoint, Point nextPoint, Piece pieceToMove, Tile destination)
+        private void MovePiece(Point nextPoint, Piece pieceToMove, Tile destination)
         {
-            int direction = (int)pieceToMove.color;
             int result = 0;
-            bool check = false;
             
-            if(destination.color == pieceToMove.color)
+            pieceToMove.nextPos = nextPoint;
+
+            if (pieceToMove.color != destination.colorOfPiece)
+            { result = pieceToMove.IsValidMove(pieceToMove, destination, piece); }
+
+            if(pieceToMove.GetType() == typeof(Piece.Pawn))
             {
-                result = 0;
+                PawnPromotion(pieceToMove, nextPoint, piece);
             }
-            else 
-            {
-                if(pieceToMove.color == pieceColor.black)
-                {
-                    check = (Piece.checkforCheck(pieceToMove, nextPoint, Piece.King.whiteKingPos, direction, piece));
-                }
-                else
-                {
-                    check = (Piece.checkforCheck(pieceToMove, nextPoint, Piece.King.blackKingPos, direction, piece));
-                }
-                   
-                result = pieceToMove.IsValidMove(currentPoint, nextPoint, destination.isEmpty, direction, pieceToMove.initial, piece);
-                if(pieceToMove.GetType() == typeof(Piece.Pawn))
-                {
-                    pawnPromotion(pieceToMove, nextPoint, piece);
-                }
                
+            MoveResult(result, nextPoint, pieceToMove, destination);
 
-            }
+            CheckForCheckmateAndCheck(pieceToMove);
 
-
-            if(check == true)
-            {
-                Score.Text = "Check";
-            }
-
-            moveResult(result, nextPoint, pieceToMove, destination);
 
             initializePiece = false;
             pieceToMove.Foreground = Brushes.Black;
@@ -253,15 +220,16 @@ namespace ChessCSharp
 
         }
 
-        private void moveResult(int result, Point nextPoint, Piece pieceToMove, Tile destination)
+        private void MoveResult(int result, Point nextPoint, Piece pieceToMove, Tile destination)
         {
             if (result >= 1)
             {
                 pieceToMove.SetValue(Grid.ColumnProperty, (Int32)nextPoint.Y);
                 pieceToMove.SetValue(Grid.RowProperty, (Int32)nextPoint.X);
-                pieceToMove.gridPosition = nextPoint;
+                pieceToMove.currentPos = nextPoint;
+                pieceToMove.firstMove = false;
                 pieceToMoveColor = pieceToMove.color;
-                pieceToMove.initial = false;
+                destination.colorOfPiece = pieceToMoveColor;
 
                 if (result == 2)
                 {
@@ -292,7 +260,7 @@ namespace ChessCSharp
  
         }
 
-        private void pawnPromotion(Piece pieceToMove, Point nextPoint, List<Piece> piece)
+        private void PawnPromotion(Piece pieceToMove, Point nextPoint, List<Piece> piece)
         {
             if ((pieceToMove.color == pieceColor.white && nextPoint.X == 7) || (pieceToMove.color == pieceColor.black && nextPoint.X == 0))
             {
@@ -312,6 +280,75 @@ namespace ChessCSharp
             }
         }
 
+        private void PrintBoard (Board b1)
+        {
+            for (int i = 0; i < b1.size; i++)
+            {
+                for (int j = 0; j < b1.size; j++)
+                {
+                    if ((i + j) % 2 == 1)
+                    {
+                        Tile t1 = new Tile(Brushes.SaddleBrown, i, j);
+                        Grid.Children.Add(t1);
+                    }
+                    else
+                    {
+                        Tile t2 = new Tile(Brushes.Beige, i, j);
+                        Grid.Children.Add(t2);
+                    }
+                }
+            }
+        }
+
+        private void CheckForCheckmateAndCheck(Piece pieceToMove)
+        {
+            bool check = false;
+            bool checkmate = false;
+
+            if (pieceToMove.color == pieceColor.black)
+            {
+                if(pieceToMove == Piece.King.blackKing)
+                {
+                    check = Piece.CheckForCheckKing(pieceToMove.color, Piece.King.blackKing, whitePiece);
+                }
+
+                else
+                {
+                    check = Piece.CheckForCheck(pieceToMove, Piece.King.whiteKing, blackPiece); 
+                }
+                
+            }
+            else 
+            {
+                if (pieceToMove == Piece.King.whiteKing)
+                {
+                    check = Piece.CheckForCheckKing(pieceToMove.color, Piece.King.whiteKing, blackPiece);
+                }
+                else
+                {
+                    check = Piece.CheckForCheck(pieceToMove, Piece.King.blackKing, whitePiece);
+                }
+
+            }
+
+            if (check)
+            {
+                Score.Text = "Check";
+
+                if (pieceToMove.color == pieceColor.black)
+                {
+                    checkmate = Piece.CheckForCheckmate(pieceToMove.color, Piece.King.whiteKing.currentPos, tiles, blackPiece);
+                }
+                else
+                {
+                    checkmate = Piece.CheckForCheckmate(pieceToMove.color, Piece.King.blackKing.currentPos, tiles, whitePiece);
+                }
+            }
+            if (checkmate)
+            {
+                Score.Text = "Checkmate";
+            }
+        }
     }
 
 }

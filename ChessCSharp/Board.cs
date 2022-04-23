@@ -9,38 +9,65 @@ using System.Windows.Input;
 
 namespace ChessCSharp
 {
-    class Board
+    class Board :Tile
     {
+        public int size = 8;
+
+        public Board(List<Tile> tiles)
+        {
+            Tile[,] board = new Tile[size, size];
+
+            for(int i = 0; i < size ; i++)
+            {
+                for(int j = 0; j < size; j++)
+                {
+                    if ((i + j) % 2 == 1)
+                    {
+                        board[i,j] = new Tile(Brushes.SaddleBrown, i, j);
+                        tiles.Add(board[i, j]);
+                    }
+                    else
+                    {
+                        board[i, j] = new Tile(Brushes.Beige, i, j);
+                        tiles.Add(board[i, j]);
+                    }
+                }
+            }
+        }
 
     }
 
     public class Tile : TextBlock
     {
-        public Point gridPosition;
+        public Point currentPos;
         public bool isEmpty = true;
-        public SolidColorBrush fillColour;
+        public pieceColor colorOfPiece = pieceColor.empty;
+ 
         public Rectangle square = new Rectangle()
         {
             Width = 70,
             Height = 70,
         };
-        public pieceColor color;
 
-        public static Tile newTile(SolidColorBrush color, int i, int j)
+        //default constructor
+        public Tile() { }
+
+
+        //constructor
+        public Tile (SolidColorBrush color, int i, int j)
         {
-            Tile t1 = new Tile();
-            t1.SetValue(Grid.ColumnProperty, i);
-            t1.SetValue(Grid.RowProperty, j);
-            t1.Background = color;
-            t1.gridPosition.X = j;
-            t1.gridPosition.Y = i;
-            return t1;
+            SetValue(Grid.ColumnProperty, i);
+            SetValue(Grid.RowProperty, j);
+            Background = color;
+            currentPos.X = j;
+            currentPos.Y = i;
         }
 
 
     }
     public enum pieceColor
     {
+        empty = 0,
         white = 1,
         black = -1
     }
@@ -49,56 +76,116 @@ namespace ChessCSharp
     {
         public bool check = false;
         public bool checkMate = false;
-        public enum pieceType
-        {
-            pawn,
-            rook,
-            knight,
-            bishop,
-            queen,
-            king
+        public pieceColor color;
+        public Point nextPos;
+        public bool firstMove = true;
 
+        abstract public int IsValidMove(Piece p1, Tile destination, List<Piece> piece);
+
+        public static bool CheckForCheck(Piece p1, Tile king, List<Piece> piece)
+        {
+
+           p1.nextPos = king.currentPos;
+
+           if (p1.IsValidMove(p1, king, piece) == 2)
+           {
+               return true;
+           }
+
+            return false;
         }
 
-        public bool initial = true;
-        abstract public int IsValidMove(Point now, Point next, bool isEmpty, int dir, bool initial, List<Piece> piece);
- 
-
-        public static bool checkforCheck(Piece p1, Point next, Point king, int dir, List<Piece> piece)
+        public static bool CheckForCheckKing(pieceColor color, Tile king, List<Piece> piece)
         {
-            if (p1.IsValidMove(next, king, false, dir, false, piece) == 2)
+            for(int i = 0; i < piece.Count; i++)
             {
-                return true;
+                Piece p1;
+                p1 = piece[i];
+                
+                if (p1.color != color)
+                {
+                    p1.nextPos = king.currentPos;
+
+                    if (p1.IsValidMove(p1, king, piece) == 2)
+                    {
+                        return true;
+                    }
+                }
             }
 
             return false;
         }
 
+        public static bool CheckForCheckmate(pieceColor color, Point kingPos, List<Tile> tiles, List<Piece> piece)
+        {
+            List<Tile> kingTiles = new List<Tile>();
+            int checks = 0;
 
-        public static bool checkForPiece(Point now, Point next, List<Piece> piece)
+            for (int x = -1; x < 2; x++)
+            {
+                for (int y = -1; y < 2; y++)
+                {
+
+                Point kingPoint = new Point(kingPos.X -x, kingPos.Y -y);
+
+                    for(int i = 0; i < tiles.Count; i++)
+                    {
+                        Tile tile = tiles[i];
+
+                        if (tile.currentPos == kingPoint && tile.isEmpty==true)
+                        {
+                            kingTiles.Add(tile);
+                        }
+
+                    }
+
+                }
+            }
+
+            for (int i = 0; i < kingTiles.Count; i++) 
+            {
+                Tile tile = kingTiles[i];
+
+                if (CheckForCheckKing(color, tile, piece))
+                {
+                    checks++;
+                }
+
+                else
+                {
+                    break;
+                }
+            }
+
+
+            return checks== kingTiles.Count;
+        }
+
+
+        public static bool CheckForPiece(Piece p1, List<Piece> piece)
         {
             int dirx = 1;
-            if (now.X > next.X)
+            if (p1.currentPos.X > p1.nextPos.X)
             { dirx = -1; }
-            else if (now.X == next.X)
+            else if (p1.currentPos.X == p1.nextPos.X)
             { dirx = 0; }
 
             int diry = 1;
-            if (now.Y > next.Y)
+            if (p1.currentPos.Y > p1.nextPos.Y)
             { diry = -1; }
-            else if (now.Y == next.Y)
+            else if (p1.currentPos.Y == p1.nextPos.Y)
             { diry = 0; }
 
 
-            for (int i = 1; ((now.X + (dirx * i)) != next.X) || ((now.Y + (diry * i)) != next.Y); i++)
+            for (int i = 1; ((p1.currentPos.X + (dirx * i)) != p1.nextPos.X) || ((p1.currentPos.Y + (diry * i)) != p1.nextPos.Y); i++)
             {
 
                 Point p;
-                p.X = now.X + (dirx * i);
-                p.Y = now.Y + (diry * i);
+                p.X = p1.currentPos.X + (dirx * i);
+                p.Y = p1.currentPos.Y + (diry * i);
 
-                foreach (var p1 in piece)
-                    if (p1.gridPosition == p)
+                foreach (var p3 in piece)
+                    if (p3.currentPos == p)
                     {
                         return true;
                     }
@@ -110,21 +197,21 @@ namespace ChessCSharp
 
         public class Pawn : Piece
         {
-            public override int IsValidMove(Point now, Point next, bool isEmpty, int dir, bool initial, List<Piece> piece)
+            public new bool firstMove = true;
+
+            public override int IsValidMove(Piece p1, Tile destination, List<Piece> piece)
             {
-
-
-                if ((next.X - now.X) == dir * 1 && Math.Abs(next.Y - now.Y) == 0 && isEmpty == true)
+                if ((p1.nextPos.X - p1.currentPos.X) == (int)p1.color * 1 && Math.Abs(p1.nextPos.Y - p1.currentPos.Y) == 0 && destination.isEmpty == true)
                 {
                     return 1;
                 }
 
-                else if ((next.X - now.X) == dir * 2 && Math.Abs(next.Y - now.Y) == 0 && isEmpty == true && initial == true)
+                else if ((p1.nextPos.X - p1.currentPos.X) == (int)p1.color * 2 && Math.Abs(p1.nextPos.Y - p1.currentPos.Y) == 0 && destination.isEmpty == true && p1.firstMove == true)
                 {
                     return 1;
                 }
 
-                else if (Math.Abs(next.X - now.X) ==  1 && Math.Abs(next.Y - now.Y) == 1 && isEmpty == false)
+                else if (Math.Abs(p1.nextPos.X - p1.currentPos.X) ==  1 && Math.Abs(p1.nextPos.Y - p1.currentPos.Y) == 1 && destination.isEmpty == false)
                 {
                     return 2;
                 }
@@ -133,18 +220,20 @@ namespace ChessCSharp
 
             }
 
-            public static Pawn createNewPawn(string text,pieceColor color, int i, int j)
+            public static Pawn CreateNewPawn(string text,pieceColor color, int i, int j)
             {
                 Piece.Pawn pawn = new Piece.Pawn();
                 pawn.Text = text;
                 pawn.TextAlignment = TextAlignment.Center;
-                pawn.FontSize = 60;
+                pawn.FontSize = (color == pieceColor.black ? 50 : 60);
                 pawn.SetValue(Grid.ColumnProperty, i);
                 pawn.SetValue(Grid.RowProperty, j);
                 pawn.color = color;
-                pawn.gridPosition.Y = i;
-                pawn.gridPosition.X = j;
+                pawn.currentPos.Y = i;
+                pawn.currentPos.X = j;
                 pawn.isEmpty = false;
+                pawn.firstMove = true;
+                pawn.colorOfPiece = color;
 
                 return pawn;
             }
@@ -153,15 +242,15 @@ namespace ChessCSharp
         public class Rook : Piece
         {
 
-            public override int IsValidMove(Point now, Point next, bool isEmpty, int dir, bool initial, List<Piece> piece)
+            public override int IsValidMove(Piece p1, Tile destination, List<Piece> piece)
             {
-                if (checkForPiece(now, next, piece) == false)
+                if (CheckForPiece(p1, piece) == false)
                 {
 
-                    if ((Math.Abs(next.X - now.X) != 0 && (next.Y - now.Y) == 0) || Math.Abs(next.Y - now.Y) != 0 && (next.X - now.X) == 0)
+                    if ((Math.Abs(p1.nextPos.X - p1.currentPos.X) != 0 && (p1.nextPos.Y - p1.currentPos.Y) == 0) || Math.Abs(p1.nextPos.Y - p1.currentPos.Y) != 0 && (p1.nextPos.X - p1.currentPos.X) == 0)
                         
                     {
-                        if (isEmpty == true)
+                        if (destination.isEmpty == true)
                         {
 
                             return 1;
@@ -178,7 +267,7 @@ namespace ChessCSharp
                 return 0;
 
             }
-            public static Rook createNewRook(string text, pieceColor color, int i, int j)
+            public static Rook CreateNewRook(string text, pieceColor color, int i, int j)
             {
                 Piece.Rook rook = new Piece.Rook();
                 rook.Text = text;
@@ -187,9 +276,10 @@ namespace ChessCSharp
                 rook.SetValue(Grid.ColumnProperty, i);
                 rook.SetValue(Grid.RowProperty, j);
                 rook.color = color;
-                rook.gridPosition.Y = i;
-                rook.gridPosition.X = j;
+                rook.currentPos.Y = i;
+                rook.currentPos.X = j;
                 rook.isEmpty = false;
+                rook.colorOfPiece = color;
 
                 return rook;
             }
@@ -198,12 +288,12 @@ namespace ChessCSharp
         public class Knight : Piece
         {
 
-            public override int IsValidMove(Point now, Point next, bool isEmpty, int dir, bool initial, List<Piece> piece)
+            public override int IsValidMove(Piece p1, Tile destination, List<Piece> piece)
             {
 
-                if (Math.Abs(next.X - now.X) == 2 &&  Math.Abs(next.Y - now.Y) == 1)
+                if (Math.Abs(p1.nextPos.X - p1.currentPos.X) == 2 &&  Math.Abs(p1.nextPos.Y - p1.currentPos.Y) == 1)
                 {
-                    if (isEmpty == true)
+                    if (destination.isEmpty == true)
                     {
 
                         return 1;
@@ -215,9 +305,9 @@ namespace ChessCSharp
                         return 2;
                     }
                 }
-                else if (Math.Abs(next.X - now.X) == 1 && Math.Abs(next.Y - now.Y) == 2)
+                else if (Math.Abs(p1.nextPos.X - p1.currentPos.X) == 1 && Math.Abs(p1.nextPos.Y - p1.currentPos.Y) == 2)
                 {
-                    if (isEmpty == true)
+                    if (destination.isEmpty == true)
                     {
 
                         return 1;
@@ -232,7 +322,7 @@ namespace ChessCSharp
                 return 0;
 
             }
-            public static Knight createNewKnight(string text, pieceColor color, int i, int j)
+            public static Knight CreateNewKnight(string text, pieceColor color, int i, int j)
             {
                 Piece.Knight knight = new Piece.Knight();
                 knight.Text = text;
@@ -241,9 +331,10 @@ namespace ChessCSharp
                 knight.SetValue(Grid.ColumnProperty, i);
                 knight.color = color;
                 knight.SetValue(Grid.RowProperty, j);
-                knight.gridPosition.X = j;
-                knight.gridPosition.Y = i;
+                knight.currentPos.X = j;
+                knight.currentPos.Y = i;
                 knight.isEmpty = false;
+                knight.colorOfPiece = color;
 
                 return knight;
             }
@@ -253,14 +344,14 @@ namespace ChessCSharp
         public class Bishop : Piece
         {
 
-            public override int IsValidMove(Point now, Point next, bool isEmpty, int dir, bool initial, List<Piece> piece)
+            public override int IsValidMove(Piece p1, Tile destination, List<Piece> piece)
             {
-                if (checkForPiece(now, next, piece) == false)
+                if (CheckForPiece(p1, piece) == false)
                 {
 
-                    if (Math.Abs(next.X - now.X) == Math.Abs(next.Y - now.Y))
+                    if (Math.Abs(p1.nextPos.X - p1.currentPos.X) == Math.Abs(p1.nextPos.Y - p1.currentPos.Y))
                     {
-                        if (isEmpty == true)
+                        if (destination.isEmpty == true)
                         {
 
                             return 1;
@@ -276,7 +367,7 @@ namespace ChessCSharp
                 return 0;
 
             }
-            public static Bishop createNewBishop(string text, pieceColor color, int i, int j)
+            public static Bishop CreateNewBishop(string text, pieceColor color, int i, int j)
             {
                 Piece.Bishop bishop = new Piece.Bishop();
                 bishop.Text = text;
@@ -285,9 +376,10 @@ namespace ChessCSharp
                 bishop.SetValue(Grid.ColumnProperty, i);
                 bishop.color = color;
                 bishop.SetValue(Grid.RowProperty, j);
-                bishop.gridPosition.X = j;
-                bishop.gridPosition.Y = i;
+                bishop.currentPos.X = j;
+                bishop.currentPos.Y = i;
                 bishop.isEmpty = false;
+                bishop.colorOfPiece = color;
 
                 return bishop;
             }
@@ -296,14 +388,14 @@ namespace ChessCSharp
         };
         public class Queen : Piece
         {
-            public override int IsValidMove(Point now, Point next, bool isEmpty, int dir, bool initial, List<Piece> piece)
+            public override int IsValidMove(Piece p1, Tile destination, List<Piece> piece)
             {
-                if (checkForPiece(now, next, piece) == false)
+                if (CheckForPiece(p1, piece) == false)
                 {
 
-                    if ((Math.Abs(next.X - now.X) != 0 && (next.Y - now.Y) == 0) || (Math.Abs(next.Y - now.Y) != 0 && (next.X - now.X) == 0))
+                    if ((Math.Abs(p1.nextPos.X - p1.currentPos.X) != 0 && (p1.nextPos.Y - p1.currentPos.Y) == 0) || (Math.Abs(p1.nextPos.Y - p1.currentPos.Y) != 0 && (p1.nextPos.X - p1.currentPos.X) == 0))
                     {
-                        if (isEmpty == true)
+                        if (destination.isEmpty == true)
                         {
 
                             return 1;
@@ -314,9 +406,9 @@ namespace ChessCSharp
                             return 2;
                         }
                     }
-                    else if (Math.Abs(next.X - now.X) ==  Math.Abs(next.Y - now.Y) )
+                    else if (Math.Abs(p1.nextPos.X - p1.currentPos.X) ==  Math.Abs(p1.nextPos.Y - p1.currentPos.Y) )
                     {
-                        if (isEmpty == true)
+                        if (destination.isEmpty == true)
                         {
 
                             return 1;
@@ -334,7 +426,7 @@ namespace ChessCSharp
                 return 0;
 
             }
-            public static Queen createNewQueen(string text, pieceColor color, int i, int j)
+            public static Queen CreateNewQueen(string text, pieceColor color, int i, int j)
             {
                 Piece.Queen queen = new Piece.Queen();
                 queen.Text = text;
@@ -343,9 +435,10 @@ namespace ChessCSharp
                 queen.SetValue(Grid.ColumnProperty, i);
                 queen.color = color;
                 queen.SetValue(Grid.RowProperty, j);
-                queen.gridPosition.X = j;
-                queen.gridPosition.Y = i;
+                queen.currentPos.X = j;
+                queen.currentPos.Y = i;
                 queen.isEmpty = false;
+                queen.colorOfPiece = color;
 
                 return queen;
             }
@@ -353,15 +446,16 @@ namespace ChessCSharp
         };
         public class King : Piece
         {
-            public static Point whiteKingPos;
-            public static Point blackKingPos;
-            public override int IsValidMove(Point now, Point next, bool isEmpty, int dir, bool initial, List<Piece> piece)
+            public static King whiteKing;
+            public static King blackKing;
+
+            public override int IsValidMove(Piece p1, Tile destination, List<Piece> piece)
             {
 
 
-                    if (Math.Abs(next.X - now.X) <= 1 && Math.Abs(next.Y - now.Y) <= 1 && now != next)
+                    if (Math.Abs(p1.nextPos.X - p1.currentPos.X) <= 1 && Math.Abs(p1.nextPos.Y - p1.currentPos.Y) <= 1 && p1.currentPos != p1.nextPos)
                     {
-                        if (isEmpty == true)
+                        if (destination.isEmpty == true)
                         {
 
                             return 1;
@@ -378,7 +472,7 @@ namespace ChessCSharp
                 return 0;
 
             }
-            public static King createNewKing(string text, pieceColor color, int i, int j)
+            public static King CreateNewKing(string text, pieceColor color, int i, int j)
             {
                 Piece.King king = new Piece.King();
                 king.Text = text;
@@ -387,9 +481,10 @@ namespace ChessCSharp
                 king.SetValue(Grid.ColumnProperty, i);
                 king.color = color;
                 king.SetValue(Grid.RowProperty, j);
-                king.gridPosition.X = j;
-                king.gridPosition.Y = i;
+                king.currentPos.X = j;
+                king.currentPos.Y = i;
                 king.isEmpty = false;
+                king.colorOfPiece = color;
 
                 return king;
             }

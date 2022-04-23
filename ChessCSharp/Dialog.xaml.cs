@@ -41,12 +41,12 @@ namespace ChessCSharp
             {
                 if(color == pieceColor.white)
                 {
-                    Piece.Rook rook = Piece.Rook.createNewRook("♖", color, i, j);
+                    Piece.Rook rook = Piece.Rook.CreateNewRook("♖", color, i, j);
                     return rook;
                 }
                 else
                 {
-                    Piece.Rook rook = Piece.Rook.createNewRook("♜", color, i, j);
+                    Piece.Rook rook = Piece.Rook.CreateNewRook("♜", color, i, j);
                     return rook;
                 }
                
@@ -56,12 +56,12 @@ namespace ChessCSharp
             {
                 if(color == pieceColor.white)
                 {
-                    Piece.Knight knight = Piece.Knight.createNewKnight("♘", color, i, j);
+                    Piece.Knight knight = Piece.Knight.CreateNewKnight("♘", color, i, j);
                     return knight;
                 }
                 else
                 {
-                    Piece.Knight knight = Piece.Knight.createNewKnight("♞", color, i, j);
+                    Piece.Knight knight = Piece.Knight.CreateNewKnight("♞", color, i, j);
                     return knight;
                 }
                
@@ -71,12 +71,12 @@ namespace ChessCSharp
             {
                 if(color == pieceColor.white)
                 {
-                    Piece.Bishop bishop = Piece.Bishop.createNewBishop("♗",color, i, j);
+                    Piece.Bishop bishop = Piece.Bishop.CreateNewBishop("♗",color, i, j);
                     return bishop;
                 }
                 else
                 {
-                    Piece.Bishop bishop = Piece.Bishop.createNewBishop("♝", color, i, j);
+                    Piece.Bishop bishop = Piece.Bishop.CreateNewBishop("♝", color, i, j);
                     return bishop;
                 }
 
@@ -86,12 +86,12 @@ namespace ChessCSharp
             {
                 if(color ==pieceColor.white)
                 {
-                    Piece.Queen queen = Piece.Queen.createNewQueen("♕",color, i, j);
+                    Piece.Queen queen = Piece.Queen.CreateNewQueen("♕",color, i, j);
                     return queen;
                 }
                 else
                 {
-                    Piece.Queen queen = Piece.Queen.createNewQueen("♛", color, i, j);
+                    Piece.Queen queen = Piece.Queen.CreateNewQueen("♛", color, i, j);
                     return queen;
                 }
  
